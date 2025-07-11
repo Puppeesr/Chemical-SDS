@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>ค้นหา + เลือกหมวดหมู่ + แสดง SDS </title>
+   <style>
+     body {
+      font-family: "Sarabun", sans-serif;
+      margin: 30px;
+      background-color: #fefefe;
+      color: #333;
+    }
+    h2 {
+      color: #006699;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th {
+      background-color: #f0f0f0;
+      padding: 8px;
+    }
+    td {
+      padding: 6px 8px;
+    }
+    input, select, button {
+      padding: 8px;
+      margin: 5px 5px 10px 0;
+      font-size: 14px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h2>🔎 Safety Data Sheet For Chemical (ChemEng.PSU)</h2>
+
+  <label for="categorySelect">📂 เลือกหมวดหมู่:</label>
+  <select id="categorySelect">
+    <option value="all">-- ทุกหมวดหมู่ --</option>
+  </select>
+
+  <input type="text" id="search" placeholder="🔍 ค้นหาชื่อสาร..." />
+  <hr />
+  <div id="output"></div>
+
+  <script>
+    // ฝังข้อมูล JSON ไว้ตรงนี้เลย (แก้ไขเพิ่มข้อมูลตามต้องการ)
+    const allData = [
+      {
+        "ID":"A001",
+	"Chemical Name": "Ammonium iron (II) Sulphate 6 - hydrate",
+	"Structure":"H8FeN2O8S2 · 6H2O",
+        "CAS no.": "7783-85-9",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Ammonium-FerrousII-Sulfate-Hexahydrate-T-010921.pdf"
+      },
+      {
+        "ID":"A002",
+	"Chemical Name": "Ammonium molybdate",
+	"Structure":"H24MO7N6O24.4H2O",
+        "CAS no.": "12054-85-2",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Ammonium-Molybdate-Tetrahydrate-T-DCC-010921.pdf"
+      },
+      {
+        "ID":"A003",
+	"Chemical Name": "Bromocresol green water",
+	"Structure":"C21H14Br4O5S",
+        "CAS no.": "76-60-8",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Bromocresol-Green-T-DCC-010921.pdf"
+      },
+      {
+       "ID":"A004",
+	"Chemical Name": "Bromothymal Blue Indicator AR",
+	"Structure":"C27H28Br2O5S",
+        "CAS no. ": "76-59-5",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-BROMOTHYMOL-BLUE-INDICATOR-CASNO-76-59-02350-TH.aspx"
+ },
+      {
+       "ID":"A005",
+	"Chemical Name": "D(+)-Glucose anhydrous",
+	"Structure":"C6H12O6",
+        "CAS no.": "50-99-7",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-DEXTROSE-ANHYDROUS-CASNO-50-99-03169-TH.aspx"
+},
+      {
+       "ID":"A006",
+	"Chemical Name": "di-Potassium hydrogen phosphate",
+	"Structure":"K2HPO4",
+        "CAS no.": "7758-11-4",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Potassium-Dihydrogen-Orthophosphate-Anhydrous-T-010921.pdf"
+},
+      {
+       "ID":"A007",
+	"Chemical Name": "Di-Sodium hydrogen phosphate anhydrous",
+	"Structure":"Na2HPO4",
+        "CAS no.": "7558-79-4",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2021/04/di-Sodium-Hydrogen-Phosphate-Anhydrous-T-030522.pdf"
+},
+      {
+       "ID":"A008",
+	"Chemical Name": "Magnesium Sulphate 7-Hydrate",
+	"Structure":"MgSO4・7H2O",
+        "CAS no.": "10034-99-8",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Magnesium-Sulfate-Heptahydrate-T-DCC-010921.pdf"
+},
+      {
+       "ID":"A009",
+	"Chemical Name": "Potassium Dihydrogen orthophosphate",
+	"Structure":"H2KO4P",
+        "CAS no.": "7778-77-0",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/potassium-dihydrogen-orthophosphate-anhydrous-t-customer-rv01-220617.pdf"
+},
+      {
+       "ID":"A010",
+	"Chemical Name": "Potassium dihydrogen phosphate",
+	"Structure":"H2KO4P",
+        "CAS no.": "7778-77-0",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/potassium-dihydrogen-orthophosphate-anhydrous-t-customer-rv01-220617.pdf"
+},
+      {
+       "ID":"A011",
+	"Chemical Name": "Potassium Hydrogen phthalate 99.5% AR",
+	"Structure":"C8H5KO4",
+        "CAS no.": "877-24-7",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-POTASSIUM-HYDROGEN-PHTHALATE-CASNO-877-24-05370-TH.aspx"
+},
+      {
+       "ID":"A012",
+	"Chemical Name": "Potassium Sulphate",
+	"Structure":"K2SO4",
+        "CAS no.": "7778-80-5",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-POTASSIUM-SULPHATE-CASNO-7778-80-05452-TH.aspx"
+},
+      {
+       "ID":"A013",
+	"Chemical Name": "Sodium Acetate 3- Hydrate",
+	"Structure":"CH3COONa.3H2O",
+        "CAS no.": "6131-90-4",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2021/04/Sodium-Acetate-Trihydrate-T-010521.pdf"
+},
+      {
+       "ID":"A014",
+	"Chemical Name": "Sodium Acetate Hydrated",
+	"Structure":"C2H3NaO2",
+        "CAS no.": "127-09-3",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-ACETATE-ANHYDROUS-CASNO-127-09-05755-TH.aspx"
+},
+      {
+       "ID":"A015",
+	"Chemical Name": "Sodium Chloride",
+	"Structure":"NaCl",
+        "CAS no.": "7647-14-5",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Sodium-Chloride-99.5-T-150521.pdf"
+},
+      {
+       "ID":"A016",
+	"Chemical Name": "Sodium Citrate tribasic dihydrate",
+	"Structure":"C6H5Na3O7 .2H2O",
+        "CAS no.": "6132-04-3",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/tri-Sodium-Citrate-Dihydrate-T-DCC-010921.pdf"
+},
+      {
+       "ID":"A017",
+	"Chemical Name": "Sodium sulfate anhydrous",
+	"Structure":"Na2SO4",
+        "CAS no.": "7757-82-6",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-SULPHATE-ANHYDROUS-CASNO-7757-82-06015-TH.aspx"
+},
+      {
+       "ID":"A018",
+	"Chemical Name": "Sodium Thiosulphate 5-hydrate",
+	"Structure":"Na2S2O3.5H2O",
+        "CAS no.": "10102-17-7",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นล่าง)",
+        "SDS": "https://rcilabscan.com/wp-content/uploads/2019/12/msds_file_th-msds1440497922-1.pdf"
+},
+      {
+       "ID":"A019",
+	"Chemical Name": "Silica gel",
+	"Structure":"SiO2",
+        "CAS no.": "112926-00-8",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SILICA-GEL-SELFINDICATING-COARSEBLUE-CASNO-112926-00-05690-TH.aspx"
+},
+      {
+       "ID":"A020",
+	"Chemical Name": "Saccharin sodium salt dihydrate",
+	"Structure":"C7H8NNaO5S",
+        "CAS no.": "6155-57-3",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.merckmillipore.com/Web-CO-Site/en_US/-/COP/ShowDocument-File?ProductSKU=MDA_CHEM-814114&DocumentType=MSD&DocumentId=814114_SDS_TH_TH.PDF&DocumentUID=559547&Language=TH&Country=TH&Origin=null"
+},
+      {
+       "ID":"A021",
+	"Chemical Name": "Potassium Chloride",
+	"Structure":"KCl",
+        "CAS no.": "7447-40-7",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-POTASSIUM-CHLORIDE-CASNO-7447-40-05340-TH.aspx"
+},
+      {
+       "ID":"A022",
+	"Chemical Name": "Sodium hydrogen carbonate 99.7% AR",
+	"Structure":"NaHCO3",
+        "CAS no.": "144-55-8",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-HYDROGEN-CARBONATE-CASNO-144-55-05895-TH.aspx"
+},
+      {
+       "ID":"A023",
+	"Chemical Name": "Poly(vinyl alcohol) 99+% hydrolyzed",
+	"Structure":"(C2H4O)n",
+        "CAS no.": "9002-89-5",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.sigmaaldrich.com/TH/en/sds/sial/p8136?userType=undefined"
+},
+      {
+       "ID":"A024",
+	"Chemical Name": "Urea Pure B.P.",
+	"Structure":"(CO(NH2)2",
+        "CAS no.": "57-13-6",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-UREA-CASNO-57-13-06449-TH.aspx"
+},
+      {
+       "ID":"A025",
+	"Chemical Name": "Sodium hydrogen carbonate",
+	"Structure":"NaHCO3",
+        "CAS no.": "144-55-8",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-HYDROGEN-CARBONATE-CASNO-144-55-05895-TH.aspx"
+},
+      {
+       "ID":"A026",
+	"Chemical Name": "Sodium phosphate monobasic dihydrate",
+	"Structure":"H2NaO4P",
+        "CAS no.": "13472-35-0",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.sigmaaldrich.com/TH/th/sds/sial/71500?userType=anonymous"
+},
+      {
+       "ID":"A027",
+	"Chemical Name": "Urea crystalline",
+	"Structure":"CH4N2O",
+        "CAS no.": "57-13-6",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Urea-T-010921.pdf"
+},
+      {
+       "ID":"A028",
+	"Chemical Name": "Poly (vinyl acetate)",
+	"Structure":"C4H6O2",
+        "CAS no.": "9003-20-7",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.sigmaaldrich.com/TH/th/sds/aldrich/189480?userType=anonymous"
+},
+      {
+       "ID":"A029",
+	"Chemical Name": "Polycaprolactone",
+	"Structure":"CH3(C6H10O2)nCH3",
+        "CAS no.": "24980-41-4",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.sigmaaldrich.com/TH/th/sds/aldrich/440752?userType=anonymous"
+},
+      {
+       "ID":"A030",
+	"Chemical Name": "Sodium Thiosulphate 5-hydrate",
+	"Structure":"Na2S2O3.5H2O",
+        "CAS no.": "10102-17-7",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-THIOSULPHATE-PENTAHYDRATE-CASNO-10102-17-06050-TH.aspx"
+},
+      {
+       "ID":"A031",
+	"Chemical Name": "Urea grade AR",
+	"Structure":"CO(NH2)2",
+        "CAS no.": "57-13-6",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-UREA-CASNO-57-13-06450-TH.aspx"
+},
+      {
+       "ID":"A032",
+	"Chemical Name": "Poly vinyl Alcohol",
+	"Structure":"(C2H4O)n",
+        "CAS no.": "9002-89-5",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-POLYVINYL-ALCOHOL-CASNO-9002-89-05315-TH.aspx"
+},
+      {
+       "ID":"A033",
+	"Chemical Name": "Potassium Sulphate",
+	"Structure":"K2SO4",
+        "CAS no.": "7778-80-5",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-POTASSIUM-SULPHATE-CASNO-7778-80-05452-TH.aspx"
+},
+      {
+       "ID":"A034",
+	"Chemical Name": "potassium Acetate",
+	"Structure":"C2H3KO2",
+        "CAS no.": "127-08-2",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-POTASSIUM-ACETATE-CASNO-127-08-05322-TH.aspx"
+},
+      {
+       "ID":"A035",
+	"Chemical Name": "Glucose",
+	"Structure":"C6H12O6",
+        "CAS no.": "50-99-7",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.info.dent.nu.ac.th/chemistry/msds/D06.pdf"
+},
+      {
+       "ID":"A036",
+	"Chemical Name": "Sodium Chloride",
+	"Structure":"NaCl",
+        "CAS no.": "7647-14-5",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Sodium-Chloride-99.5-T-150521.pdf"
+},
+      {
+       "ID":"A037",
+	"Chemical Name": "Potassium hydrogen phthalate",
+	"Structure":"C8H5KO4",
+        "CAS no.": "877-24-7",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-POTASSIUM-HYDROGEN-PHTHALATE-CASNO-877-24-05370-TH.aspx"
+},
+      {
+       "ID":"A038",
+	"Chemical Name": "Silica",
+	"Structure":"SiO2",
+        "CAS no.": "14464-46-1",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SILICA-GEL-SELFINDICATING-COARSEBLUE-CASNO-112926-00-05690-TH.aspx"
+},
+      {
+       "ID":"A039",
+	"Chemical Name": "Silicon Carbide",
+	"Structure":"SiC",
+        "CAS no.": "409-21-2",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.sigmaaldrich.com/TH/th/sds/aldrich/378097?userType=anonymous"
+},
+      {
+       "ID":"A040",
+	"Chemical Name": "Sodium Acetate Anhydrous",
+	"Structure":"CH3COONa",
+        "CAS no.": "127-09-3",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-ACETATE-ANHYDROUS-CASNO-127-09-05755-TH.aspx"
+},
+      {
+       "ID":"A041",
+	"Chemical Name": "Sodium tripolyphosphate",
+	"Structure":"Na5P3O10",
+        "CAS no.": "7758-29-4",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-TRIPOLYPHOSPHATE-ANHYDROUS-CASNO-7758-29-06054-TH.aspx"
+},
+      {
+       "ID":"A042",
+	"Chemical Name": "Potassium Chloride",
+	"Structure":"KCl",
+        "CAS no.": "7447-40-7",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2020/02/Potassium-Chloride-T-010521.pdf"
+},
+      {
+       "ID":"A043",
+	"Chemical Name": "Starch Soluble",
+	"Structure":"(C6H10O5)n",
+        "CAS no.": "9005-84-9",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-STARCH-SOLUBLE-EX-POTATO-CASNO-9005-84-06125-TH.aspx"
+},
+      {
+       "ID":"A044",
+	"Chemical Name": "Zinc Sulphide",
+	"Structure":"ZnS",
+        "CAS no.": "1314-98-3",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-ZINC-SULPHIDE-CASNO-1314-98-06557-TH.aspx"
+},
+      {
+       "ID":"A045",
+	"Chemical Name": "Methyl Red",
+	"Structure":"C15H15N3O2",
+        "CAS no.": "493-52-7",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-METHYL-RED-INDICATOR-CASNO-493-52-04675-TH.aspx"
+},
+      {
+       "ID":"A046",
+	"Chemical Name": "Water (HPCL)",
+	"Structure":"H2O",
+        "CAS no.": "7732-18-5",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-Water-6483D-TH.aspx"
+},
+      {
+       "ID":"A047",
+	"Chemical Name": "L-Ascorbic Acid",
+	"Structure":"C6H8O6",
+        "CAS no.": "50-81-7",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-LASCORBIC-ACID-CASNO-50-81-01549-TH.aspx"
+},
+      {
+       "ID":"A048",
+	"Chemical Name": "Triethanolamine",
+	"Structure":"C6H15NO3",
+        "CAS no.": "102-71-6",
+        "หมวดหมู่": "สารไม่อันตราย (ชั้นบน)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-TRIETHANOLAMINE-CASNO-102-71-06360-TH.aspx"
+},
+      {
+       "ID":"B001",
+	"Chemical Name": "Sodium Azide",
+	"Structure":"NaN3",
+        "CAS no.": "26628-22-8",
+        "หมวดหมู่": "สารพิษ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-AZIDE-CASNO-26628-22-05782-TH.aspx"
+},
+      {
+       "ID":"C001",
+	"Chemical Name": "Formic Acid 98/100%",
+	"Structure":"CH2O2",
+        "CAS no.": "64-18-6",
+        "หมวดหมู่": "สารไวไฟ + กัดกร่อน",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-FORMIC-ACID-CASNO-64-18-00152-TH.aspx"
+},
+      {
+       "ID":"C002",
+	"Chemical Name": "WIJS Solution",
+	"Structure":"ICl",
+        "CAS no.": "7790-99-0",
+        "หมวดหมู่": "สารไวไฟ + กัดกร่อน",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2020/11/Wijs-Solution-0.1-N-GN1212PT-T-011121.pdf"
+},
+      {
+       "ID":"C003",
+	"Chemical Name": "Acetic Acid glacial AR",
+	"Structure":"C2H4O2",
+        "CAS no.": "64-19-7",
+        "หมวดหมู่": "สารไวไฟ + กัดกร่อน",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-ACETIC-ACID-GLACIAL-CASNO-64-19-00005-TH.aspx"
+},
+      {
+       "ID":"D001",
+	"Chemical Name": "Sodium Methoxide Solution",
+	"Structure":"CH3NaO",
+        "CAS no.": "124-41-4",
+        "หมวดหมู่": "สารไวไฟ + กัดกร่อน + เป็นพิษ + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-METHOXIDE-30-SOLUTION-IN-METHANOL-CASNO-5938A-TH.aspx"
+},
+      {
+       "ID":"E001",
+	"Chemical Name": "Diethylamine 99.5% for synthesis",
+	"Structure":"(CH3CH2)2NH",
+        "CAS no.": "109-89-7",
+        "หมวดหมู่": "สารไวไฟ + กัดกร่อน + เป็นพิษ",
+        "SDS": "https://www.sigmaaldrich.com/TH/th/sds/sial/471216?userType=anonymous"
+},
+      {
+       "ID":"F001",
+	"Chemical Name": "Methyl Alcohol Anhydrous AR",
+	"Structure":"CH4O",
+        "CAS no.": "67-56-1",
+        "หมวดหมู่": "สารไวไฟ + เป็นพิษ + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-METHANOL-CASNO-67-56-00196-TH.aspx"
+},
+      {
+       "ID":"F002",
+	"Chemical Name": "Methanol",
+	"Structure":"CH3OH",
+        "CAS no.": "67-56-1",
+        "หมวดหมู่": "สารไวไฟ + เป็นพิษ + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2020/04/Methanol-T-010420.pdf"
+},
+      {
+       "ID":"G001",
+	"Chemical Name": "n-Butyl acetate AR",
+	"Structure":"C6H12O2",
+        "CAS no.": "123-86-4",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-nBUTYL-ACETATE-CASNO-123-86-00061-TH.aspx"
+},
+      {
+       "ID":"G002",
+	"Chemical Name": "n-butyl Acetate",
+	"Structure":"CH3COO(CH2)3CH3",
+        "CAS no.": "123-86-4",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/n-Butyl-Acetate-T-DCC-010421.pdf"
+},
+      {
+       "ID":"G003",
+	"Chemical Name": "Tetra ethyl orthosilicate reagent grade 98%",
+	"Structure":"C8H20O4Si",
+        "CAS no.": "78-10-4",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง",
+        "SDS": "https://www.sigmaaldrich.com/TH/th/sds/aldrich/131903?userType=anonymous"
+},
+      {
+       "ID":"G004",
+	"Chemical Name": "2-Methyl-2-Propanol for analysis ACS",
+	"Structure":"C4H10O",
+        "CAS no.": "75-65-0",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-tertBUTANOL-CASNO-75-65-0059A-TH.aspx"
+},
+      {
+       "ID":"G005",
+	"Chemical Name": "Ethyl Methyl Ketone",
+	"Structure":"C2H5COCH3",
+        "CAS no.": "78-93-3",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Methyl-Ethyl-Ketone-T-010421.pdf"
+},
+      {
+       "ID":"G006",
+	"Chemical Name": "Methyl isobutyl Ketone",
+	"Structure":"(CH3)2CHCH2COCH3",
+        "CAS no.": "108-10-1",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Methyl-Isobutyl-Ketone-T-DCC-020821.pdf"
+},
+      {
+       "ID":"G007",
+	"Chemical Name": "Isopropyl alcohol AR",
+	"Structure":"C3H8O",
+        "CAS no.": "67-63-0",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-isoPROPYL-ALCOHOL-CASNO-67-63-00271-TH.aspx"
+},
+      {
+       "ID":"G008",
+	"Chemical Name": "Acetone",
+	"Structure":"CH3COCH3",
+        "CAS no.": "67‐64‐1",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2020/04/Acetone-T-010420.pdf"
+},
+      {
+       "ID":"G009",
+	"Chemical Name": "Acetonitrile",
+	"Structure":"C2H3N",
+        "CAS no.": "75-05-8",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-acetonitrile-CASNO-75-05-0017H-TH.aspx"
+},
+      {
+       "ID":"G010",
+	"Chemical Name": "Ethanol Absolute AR",
+	"Structure":"C2H6O",
+        "CAS no.": "64-17-5",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง",
+        "SDS": "https://www.unitywewell.com/uploads/products/sds/ET0005-thaiSDS.pdf"
+},
+      {
+       "ID":"G011",
+	"Chemical Name": "Dimethyl Ether",
+	"Structure":"C2H6O",
+        "CAS no.": "115-10-6",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2020/08/Diethyl-Ether-EtOH-T-DCC-010421.pdf"
+},
+      {
+       "ID":"G012",
+	"Chemical Name": "2-Propanol",
+	"Structure":"(CH3)2CHOH",
+        "CAS no.": "67-63-0",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2021/08/Propan-2-ol-Labsolv-T-160821.pdf"
+},
+      {
+       "ID":"G013",
+	"Chemical Name": "Isopropyl Alcohol HPCL / PECTRO",
+	"Structure":"C3H8O",
+        "CAS no.": "67-63-0",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง",
+        "SDS": "https://www.apcbkk.com/pdf/products/Alcohols/SDS/IPA_TH.pdf"
+},
+      {
+       "ID":"G014",
+	"Chemical Name": "2,4-Dinitrophenyl Hydrazine",
+	"Structure":"(NO2)2C6H3NHNH2",
+        "CAS no.": "119-26-6",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-24DINITROPHENYL-HYDRAZINE-CASNO-119-26-03471-TH.aspx"
+},
+      {
+       "ID":"H001",
+	"Chemical Name": "Sodium Lauryl sulphate",
+	"Structure":"C12H25O4S.Na",
+        "CAS no.": "151-21-3",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง + กัดกร่อน",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-LAURYL-SULPHATE-POWDER-CASNO-151-21-05926-TH.aspx"
+},
+      {
+       "ID":"H002",
+	"Chemical Name": "Butan-1-ol (n-Butanol)",
+	"Structure":"C4H10O",
+        "CAS no.": "71-36-3",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง + กัดกร่อน",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Butan-1-ol-Labsolv-T-010421.pdf"
+},
+      {
+       "ID":"I001",
+	"Chemical Name": "N,N- Dimethylformamide",
+	"Structure":"C3H7NO",
+        "CAS no.": "68-12-2",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2021/09/Dimethylformamide-T-DCC-210921.pdf"
+},
+      {
+       "ID":"I002",
+	"Chemical Name": "Toluene AR",
+	"Structure":"C7H8",
+        "CAS no.": "108-88-3",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-TOLUENE-CASNO-108-88-00326-TH.aspx"
+},
+      {
+       "ID":"J001",
+	"Chemical Name": "Cyclohexane 99.5% AR",
+	"Structure":"C6H12",
+        "CAS no.": "110-82-7",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง + เป็นอันตรายต่อสุขภาพ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-CYCLOHEXANE-CASNO-110-82-00082-TH.aspx"
+},
+      {
+       "ID":"J002",
+	"Chemical Name": "N-hexane 95% AR",
+	"Structure":"CH3(CH2)4CH3",
+        "CAS no.": "110-54-3",
+        "หมวดหมู่": "Solution (ตู้ที่ 2)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/n-Hexane-95-T-010421.pdf"
+},
+      {
+       "ID":"J003",
+	"Chemical Name": "n-Heptane",
+	"Structure":"C7H16",
+        "CAS no.": "142-82-5",
+        "หมวดหมู่": "Solution (ตู้ที่ 2)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-nheptaneGMP-CASNO-142-82-G049B-TH.aspx"
+},
+      {
+       "ID":"J004",
+	"Chemical Name": "2,2,4-Trimethylpentane AR",
+	"Structure":"C8H18",
+        "CAS no.": "540-84-1",
+        "หมวดหมู่": "Solution (ตู้ที่ 2)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-224TRIMETHYLPENTANE-CASNO-540-84-00351-TH.aspx"
+},
+      {
+       "ID":"J005",
+	"Chemical Name": "Hexanes",
+	"Structure":"C6H14",
+        "CAS no.": "110-54-3",
+        "หมวดหมู่": "Solution (ตู้ที่ 2)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-HEXANE-CASNO-110-54-0160F-TH.aspx"
+},
+      {
+       "ID":"K001",
+	"Chemical Name": "Chlorbenzol",
+	"Structure":"C6H5Cl",
+        "CAS no.": "108-90-7",
+        "หมวดหมู่": "สารไวไฟ + สารที่ต้องระวัง + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Chlorobenzene-T-010421.pdf"
+},
+      {
+       "ID":"L001",
+	"Chemical Name": "Petroleum Ether AR (40-60 celcius degree)",
+	"Structure":"C6H14",
+        "CAS no.": "8032-32-4",
+        "หมวดหมู่": "สารไวไฟ + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.sigmaaldrich.com/TH/th/sds/vetec/v800295?userType=anonymous"
+},
+      {
+       "ID":"M001",
+	"Chemical Name": "Sodium Metaperiodate",
+	"Structure":"NaIO4",
+        "CAS no.": "7790-28-5",
+        "หมวดหมู่": "สารออกซิไดซ์ + กัดกร่อน + เป็นอันตรายต่อสุขภาพ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-METAPERIODATE-CASNO-7790-28-05968-TH.aspx"
+},
+      {
+       "ID":"N001",
+	"Chemical Name": "Potassium Dichromate",
+	"Structure":"Cr2K2O7",
+        "CAS no.": "7778-50-9",
+        "หมวดหมู่": "สารออกซิไดซ์ + เป็นพิษ + กัดกร่อน + เป็นอันตรายต่อสุขภาพ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-POTASSIUM-DICHROMATE-CASNO-7778-50-05354-TH.aspx"
+},
+      {
+       "ID":"O01",
+	"Chemical Name": "Ethanolamine (Mono) 99% AR/ACS",
+	"Structure":"C2H7NO",
+        "CAS no.": "141-43-5",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-ETHANOLAMINE-MONO-CASNO-141-43-00135-TH.aspx"
+},
+      {
+       "ID":"O02",
+	"Chemical Name": "n-Butyric Acid",
+	"Structure":"C4H8O2",
+        "CAS no.": "107-92-6",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง",
+        "SDS": "https://www.fishersci.com/store/msds?partNumber=AC108111000&productDescription=N-BUTYRIC+ACID%2C+99%2B%25+100MLN-B&vendorId=VN00032119&countryCode=US&language=en"
+},
+      {
+       "ID":"O03",
+	"Chemical Name": "Potassium Hydroxide pellets Grade AR",
+	"Structure":"KOH",
+        "CAS no.": "1310-58-3",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง",
+        "SDS": "MSDS-POTASSIUM-HYDROXIDE-PELLETS-CASNO-1310-58-05380-TH.aspx"
+},
+      {
+       "ID":"O04",
+	"Chemical Name": "Ferric Chloride Anhydrous 99% AR",
+	"Structure":"FeCl3",
+        "CAS no.": "7705-08-0",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-FERRIC-CHLORIDE-ANHYDROUS-CASNO-7705-08-03818-TH.aspx"
+},
+      {
+       "ID":"O05",
+	"Chemical Name": "Sodium silicate",
+	"Structure":"Na2SiO3.9H2O",
+        "CAS no.": "1344-09-8",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-SILICATE-POWDER-META-CASNO-13517-24-06000-TH.aspx"
+},
+      {
+       "ID":"O06",
+	"Chemical Name": "Oxalic Acid Dihydrate",
+	"Structure":"C2H2O4.2H2O",
+        "CAS no.": "6153-56-6",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-OXALIC-ACID-CASNO-6153-56-05072-EN.aspx"
+},
+      {
+       "ID":"O07",
+	"Chemical Name": "Phosphoric Acid 85%",
+	"Structure":"H3PO4",
+        "CAS no.": "7664-38-2",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง",
+        "SDS": "http://hazexam.diw.go.th/upload/2562/2843_upload5_11_2.pdf"
+},
+      {
+       "ID":"O08",
+	"Chemical Name": "Sodium dodecyl sulfate",
+	"Structure":"C12H25O4S.Na",
+        "CAS no.": "151-21-3",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-LAURYL-SULPHATE-POWDER-CASNO-151-21-05926-TH.aspx"
+},
+      {
+       "ID":"O09",
+	"Chemical Name": "Potassium Hydroxide",
+	"Structure":"KOH",
+        "CAS no.": "1310-58-3",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Potassium-Hydroxide-85-T-010921.pdf"
+},
+      {
+       "ID":"O10",
+	"Chemical Name": "Hydrochloric Acid 37%",
+	"Structure":"HCl",
+        "CAS no.": "7647-01-0",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง",
+        "SDS": "https://rcilabscan.com/wp-content/uploads/2019/11/hydrochloric-acid-37-t-customer-rv03-010718.pdf"
+},
+      {
+       "ID":"P001",
+	"Chemical Name": "Hydrogen Peroxide 35% Solution",
+	"Structure":"H2O2",
+        "CAS no.": "7722-84-1",
+        "หมวดหมู่": "สารกัดกร่อน + สารออกซิไดซ์ + สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-hydrogen-peroxide-35-ww-CASNO-7722-84-0183A-TH.aspx"
+},
+      {
+       "ID":"Q01",
+	"Chemical Name": "Salicylic Acid",
+	"Structure":"C7H6O3",
+        "CAS no.": "69-72-7",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SALICYLIC-ACID-CASNO-69-72-05640-TH.aspx"
+},
+      {
+       "ID":"Q02",
+	"Chemical Name": "Phthalic Anhydride, Reagent PLus 99%",
+	"Structure":"C8H4O3",
+        "CAS no.": "85-44-9",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-PHTHALIC-ANHYDRIDE-CASNO-85-44-05277-TH.aspx"
+},
+      {
+       "ID":"Q03",
+	"Chemical Name": "Maleic Anhydride",
+	"Structure":"C4H2O3",
+        "CAS no.": "108-31-6",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.fishersci.com/store/msds?partNumber=AC125240251&countryCode=US&language=en"
+},
+      {
+       "ID":"R001",
+	"Chemical Name": "Ammonium Hydroxide",
+	"Structure":"NH4OH",
+        "CAS no.": "1336-21-6",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง + เป็นอันตรายต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2020/02/Ammonium-Hydroxide-28-Solution-T-240120.pdf"
+},
+      {
+       "ID":"R002",
+	"Chemical Name": "Zinc Acetate",
+	"Structure":"C4H6O4Zn·2H2O",
+        "CAS no.": "5970-45-6",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง + เป็นอันตรายต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-ZINC-ACETATE-DIHYDRATE-CASNO-5970-45-06541-TH.aspx"
+},
+      {
+       "ID":"R003",
+	"Chemical Name": "Zinc Sulphate 7-hydrate",
+	"Structure":"ZnSO4.7H2O",
+        "CAS no.": "7446-20-0",
+        "หมวดหมู่": "สารกัดกร่อน + สารที่ต้องระวัง + เป็นอันตรายต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://rcilabscan.com/wp-content/uploads/2019/11/Zinc-Sulfate-Heptahydrate-T-010921.pdf"
+},
+      {
+       "ID":"S001",
+	"Chemical Name": "Benzoic Acid 99.5%",
+	"Structure":"C7H6O2",
+        "CAS no.": "65-85-0",
+        "หมวดหมู่": "สารกัดกร่อน + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "MSDS-BENZOIC-ACID-CASNO-65-85-01861-TH.aspx"
+},
+      {
+       "ID":"S002",
+	"Chemical Name": "Aluminium Chloride 6-hydrate",
+	"Structure":"AlCl3.6H2O",
+        "CAS no.": "7784-13-6",
+        "หมวดหมู่": "สารกัดกร่อน + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-ALUMINIUM-CHLORIDE-HEXAHYDRATE-CASNO-7784-13-00898-TH.aspx"
+},
+      {
+       "ID":"S003",
+	"Chemical Name": "Benzoic Acid",
+	"Structure":"C7H6O2",
+        "CAS no.": "65-85-0",
+        "หมวดหมู่": "สารกัดกร่อน + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-BENZOIC-ACID-CASNO-65-85-01860-TH.aspx"
+},
+      {
+       "ID":"T001",
+	"Chemical Name": "Silver Sulphate",
+	"Structure":"Ag2O4S",
+        "CAS no.": "10294-26-5",
+        "หมวดหมู่": "สารกัดกร่อน + เป็นอันตรายต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SILVER-SULPHATE-CASNO-10294-26-05750-TH.aspx"
+},
+      {
+       "ID":"U001",
+	"Chemical Name": "Nitric Acid",
+	"Structure":"HNO3",
+        "CAS no.": "7697-37-2",
+        "หมวดหมู่": "สารพิษ + กัดกร่อน + สารออกซิไดซ์",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Nitric-Acid-65-T-010721.pdf"
+},
+      {
+       "ID":"V001",
+	"Chemical Name": "Sodium Nitrite",
+	"Structure":"NaNO2",
+        "CAS no.": "7632-00-0",
+        "หมวดหมู่": "สารพิษ + สารออกซิไดซ์ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Sodium-Nitrite-T-010921.pdf"
+},
+      {
+       "ID":"W001",
+	"Chemical Name": "Chloroform",
+	"Structure":"CHCl₃",
+        "CAS no.": "67-66-3",
+        "หมวดหมู่": "สารพิษ + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-CHLOROFORM-CASNO-67-66-00076-TH.aspx"
+},
+      {
+       "ID":"W002",
+	"Chemical Name": "Carbon Tetrachloride",
+	"Structure":"CCl4",
+        "CAS no.": "56-23-5",
+        "หมวดหมู่": "สารพิษ + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-CARBON-TETRACHLORIDE-CASNO-56-23-00070-TH.aspx"
+},
+      {
+       "ID":"X001",
+	"Chemical Name": "Formaldehyde, 37% Solution",
+	"Structure":"HCHO",
+        "CAS no.": "50-00-0",
+        "หมวดหมู่": "สารพิษ + เป็นอันตรายต่อสุขภาพ + กัดกร่อน",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-FORMALDEHYDE-SOLUTION-CASNO-50-00-00147-TH.aspx"
+},
+      {
+       "ID":"X002",
+	"Chemical Name": "Formaldehyde 40%",
+	"Structure":"HCHO",
+        "CAS no.": "50-00-1",
+        "หมวดหมู่": "สารพิษ + เป็นอันตรายต่อสุขภาพ + กัดกร่อน",
+        "SDS": "https://rcilabscan.com/wp-content/uploads/2019/11/formaldehyde-35-40-t-customer-rv01-010718.pdf"
+},
+      {
+       "ID":"X003",
+	"Chemical Name": "Phenol Crystalline, 99% for synthesis",
+	"Structure":"C6H6O",
+        "CAS no.": "108-95-2",
+        "หมวดหมู่": "สารพิษ + เป็นอันตรายต่อสุขภาพ + กัดกร่อน",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-PHENOL-DETACHED-CRYSTALS-CASNO-108-95-5170B-TH.aspx"
+},
+      {
+       "ID":"X004",
+	"Chemical Name": "Chloroacetic Acid, 99% for synthesis",
+	"Structure":"CH2Cl.COOH",
+        "CAS no.": "79-11-8",
+        "หมวดหมู่": "สารพิษ + เป็นอันตรายต่อสุขภาพ + กัดกร่อน",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-CHLOROACETIC-ACID-CASNO-79-11-02729-TH.aspx"
+},
+      {
+       "ID":"Y001",
+	"Chemical Name": "Aniline, 99% for synthesis",
+	"Structure":"C6H5NH2",
+        "CAS no.": "142-04-1",
+        "หมวดหมู่": "สารพิษ + เป็นอันตรายต่อสุขภาพ + กัดกร่อน + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.pentachemicals.eu/data/Bezpecnostni_listy/en/Aniline%20hydrochloride_0055_5.0.pdf"
+},
+      {
+       "ID":"Z001",
+	"Chemical Name": "Nickel Chloride 6-Hydrate",
+	"Structure":"NiCl2.6H2O",
+        "CAS no.": "7791-20-0",
+        "หมวดหมู่": "สารพิษ + เป็นอันตรายต่อสุขภาพ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-NICKEL-CHLORIDE-HEXAHYDRATE-CASNO-7791-20-04874-TH.aspx"
+},
+      {
+       "ID":"Z002",
+	"Chemical Name": "Nitrobenzene for synthesis",
+	"Structure":"C6H5NO2",
+        "CAS no.": "98-95-3",
+        "หมวดหมู่": "สารพิษ + เป็นอันตรายต่อสุขภาพ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-NITROBENZENE-CASNO-98-95-04936-TH.aspx"
+},
+      {
+       "ID":"Z003",
+	"Chemical Name": "Diphenylamine 99%",
+	"Structure":"C12H11N",
+        "CAS no.": "122-39-4",
+        "หมวดหมู่": "สารพิษ + เป็นอันตรายต่อสุขภาพ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-DIPHENYLAMINE-CASNO-122-39-03501-TH.aspx"
+},
+      {
+       "ID":"Z004",
+	"Chemical Name": "Mercury(II) Oxide,Red",
+	"Structure":"HgO",
+        "CAS no.": "21908-53-2",
+        "หมวดหมู่": "สารพิษ + เป็นอันตรายต่อสุขภาพ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-MERCURIC-OXIDE-RED-CASNO-21908-53-04579-TH.aspx"
+},
+      {
+       "ID":"Z005",
+	"Chemical Name": "Mercury",
+	"Structure":"Hg",
+        "CAS no.": "7439-97-6",
+        "หมวดหมู่": "สารพิษ + เป็นอันตรายต่อสุขภาพ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-MERCURY-METAL-CASNO-7439-97-04596-TH.aspx"
+},
+      {
+       "ID":"AA01",
+	"Chemical Name": "Potassium Persulphate",
+	"Structure":"K2S2O8",
+        "CAS no.": "7727-21-1",
+        "หมวดหมู่": "สารที่ต้องระวัง + สารออกซิไดซ์ + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2022/08/Potassium-Persulfate-T-080822.pdf"
+},
+      {
+       "ID":"AB01",
+	"Chemical Name": "Ethanediol 99.5% AR",
+	"Structure":"C2H6O2",
+        "CAS no.": "107-21-1",
+        "หมวดหมู่": "สารที่ต้องระวัง +  เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-ETHANEDIOL-CASNO-107-21-00132-TH.aspx"
+},
+      {
+       "ID":"AB02",
+	"Chemical Name": "Ethanediol 99.5% AR",
+	"Structure":"C6H5NO3",
+        "CAS no.": "100-02-7",
+        "หมวดหมู่": "สารที่ต้องระวัง +  เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-pNITROPHENOL-CASNO-100-02-05015-TH.aspx"
+},
+      {
+       "ID":"AB03",
+	"Chemical Name": "Trichloro Ethylene",
+	"Structure":"Cl2CCHCl",
+        "CAS no.": "79-01-6",
+        "หมวดหมู่": "สารที่ต้องระวัง +  เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Trichloroethylene-T-010521.pdf"
+},
+      {
+       "ID":"AC01",
+	"Chemical Name": "Tetramethylthiuramdisulfid 97%",
+	"Structure":"C6H12N2S4",
+        "CAS no.": "137-26-8",
+        "หมวดหมู่": "สารที่ต้องระวัง +  เป็นอันตรายต่อสุขภาพ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.sigmaaldrich.com/TH/th/sds/aldrich/t24201?userType=anonymous"
+},
+      {
+       "ID":"AC02",
+	"Chemical Name": "Potassium Chromate",
+	"Structure":"K2CrO4",
+        "CAS no.": "7789-00-6",
+        "หมวดหมู่": "สารที่ต้องระวัง +  เป็นอันตรายต่อสุขภาพ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-POTASSIUM-CHROMATE-CASNO-7789-00-05344-TH.aspx"
+},
+      {
+       "ID":"AC03",
+	"Chemical Name": "Benedicts Solution",
+	"Structure":"K2CrO4",
+        "CAS no.": "7789-00-6",
+        "หมวดหมู่": "สารที่ต้องระวัง +  เป็นอันตรายต่อสุขภาพ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.southernbiological.com/content/MSDS/MC4.1_MC4.3_%20Benedicts%20Solution%20SDS%202020.pdf?srsltid=AfmBOop1Gg-XmtOnVneTiy9HrxGXWO_Qm4G3FVGjiXQ2hieAQ0A1n-dF"
+},
+      {
+       "ID":"AD01",
+	"Chemical Name": "2-Napthol 99% AR",
+	"Structure":"C10H8O",
+        "CAS no.": "135-19-3",
+        "หมวดหมู่": "สารที่ต้องระวัง +  เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-2NAPHTHOL-CASNO-135-19-04761-TH.aspx"
+},
+      {
+       "ID":"AD02",
+	"Chemical Name": "Phenanthrene",
+	"Structure":"C14H10",
+        "CAS no.": "85-01-8",
+        "หมวดหมู่": "สารที่ต้องระวัง + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.sigmaaldrich.com/TH/en/sds/aldrich/p11409?userType=undefined"
+},
+      {
+       "ID":"AE01",
+	"Chemical Name": "Copper chromite Catalyst",
+	"Structure":"Cr2Cu2O5",
+        "CAS no.": "12053-18-8",
+        "หมวดหมู่": "สารที่ต้องระวัง + สารออกซิไดซ์ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ",
+        "SDS": "https://www.sigmaaldrich.com/TH/th/sds/aldrich/209317?userType=anonymous"
+},
+      {
+       "ID":"AF01",
+	"Chemical Name": "Potassium Permanganate",
+	"Structure":"KMnO4",
+        "CAS no.": "7722-64-7",
+        "หมวดหมู่": "สารที่ต้องระวัง + สารออกซิไดซ์ + เป็นพิษต่อสิ่งแวดล้อมทางน้ำ + เป็นอันตรายต่อสุขภาพ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-POTASSIUM-PERMANGANATE-CASNO-7722-64-05410-TH.aspx"
+},
+      {
+       "ID":"AG01",
+	"Chemical Name": "Manganese(II) Sulphate 1-hydrate",
+	"Structure":"MnSO4.H2O",
+        "CAS no.": "10034-96-5",
+        "หมวดหมู่": "สารที่เป็นพิษต่อสิ่งแวดล้อมทางน้ำ + เป็นพิษต่อสุขภาพ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-MANGANESE-II-SULPHATE-CASNO-10034-96-04510-TH.aspx"
+},
+      {
+       "ID":"AI01",
+	"Chemical Name": "Potassium Dichromate",
+	"Structure":"K2Cr2O7",
+        "CAS no.": "7778-50-9",
+        "หมวดหมู่": "สารพิษ + สารออกซิไดซ์ + กัดกร่อน + เป็นอันตรายต่อสิ่งแวดล้อมทางน้ำ + เป็นพิษต่อสุขภาพ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-POTASSIUM-DICHROMATE-CASNO-7778-50-05354-TH.aspx"
+},
+      {
+       "ID":"Cr01",
+	"Chemical Name": "Sodium Hydroxide",
+	"Structure":"NaOH",
+        "CAS no.": "1310-73-2",
+        "หมวดหมู่": "สารกัดกร่อน (ชั้น 3)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-OXALATE-CASNO-62-76-05961-TH.aspx"
+},
+      {
+       "ID":"Cr02",
+	"Chemical Name": "tri - sodium orthophosphate",
+	"Structure":"Na3O4P·12H2O",
+        "CAS no.": "10101-89-0",
+        "หมวดหมู่": "สารกัดกร่อน (ชั้น 3)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-triSODIUM-ORTHOPHOSPHATE-DODECAHYDRATE-CASNO-10101-89-05959-TH.aspx"
+},
+      {
+       "ID":"Cr03",
+	"Chemical Name": "Lactic Acid (Food)",
+	"Structure":"C3H6O3",
+        "CAS no.": "50-21-5",
+        "หมวดหมู่": "สารกัดกร่อน (ชั้น 3)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-LACTIC-ACID-CASNO-50-21-04310-TH.aspx"
+},
+      {
+       "ID":"Cr04",
+	"Chemical Name": "Sulphuric Acid 98%",
+	"Structure":"H2SO4",
+        "CAS no.": "7664-93-9",
+        "หมวดหมู่": "สารกัดกร่อน (ชั้น 3)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Sulfuric-Acid-98-Labsolv-T-010721.pdf"
+},
+      {
+       "ID":"Cr05",
+	"Chemical Name": "Phosphoric Acid 85%",
+	"Structure":"H3PO4",
+        "CAS no.": "7664-38-2",
+        "หมวดหมู่": "สารกัดกร่อน (ชั้น 3)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Phosphoric-Acid-85-T-090721.pdf"
+},
+     {
+       "ID":"EH01",
+	"Chemical Name": "Zinc Oxide",
+	"Structure":"ZnO",
+        "CAS no.": "1314-13-2",
+        "หมวดหมู่": "สารที่เป็นพิษต่อสิ่งแวดล้อมทางน้ำ (ชั้น 1 บนซ้าย)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-ZINC-OXIDE-CASNO-1314-13-06552-TH.aspx"
+},
+     {
+       "ID":"EH02",
+	"Chemical Name": "Pyrene",
+	"Structure":"C16H10",
+        "CAS no.": "129-00-0",
+        "หมวดหมู่": "สารที่เป็นพิษต่อสิ่งแวดล้อมทางน้ำ (ชั้น 1 บนซ้าย)",
+        "SDS": "https://www.fishersci.com/store/msds?partNumber=AC180830250&productDescription=PYRENE%2C+98%2B%25%28GC%29+25GR&vendorId=VN00032119&countryCode=US&language=en"
+},
+     {
+       "ID":"EH03",
+	"Chemical Name": "Copper(II) Oxide",
+	"Structure":"CuO",
+        "CAS no.": "1317-38-0",
+        "หมวดหมู่": "สารที่เป็นพิษต่อสิ่งแวดล้อมทางน้ำ (ชั้น 1 บนซ้าย)",
+        "SDS": "https://www.fishersci.se/chemicalProductData_uk/wercs?itemCode=10016143&lang=EN"
+},
+     {
+       "ID":"FM01",
+	"Chemical Name": "Ethanol Absolute AR",
+	"Structure":"C2H6O",
+        "CAS no.": "64-17-5",
+        "หมวดหมู่": "สารไวไฟ (ในตู้)",
+        "SDS": "https://www.unitywewell.com/uploads/products/sds/CL00.0505-thaiSDS.pdf"
+},
+      {
+       "ID":"FM02",
+	"Chemical Name": "Dimethyl Carbonate 99%",
+	"Structure":"C3H6O3",
+        "CAS no.": "616-38-6",
+        "หมวดหมู่": "สารไวไฟ (ในตู้)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-DIMETHYL-CARBONATE-CASNO-616-38-03394-TH.aspx"
+},
+      {
+       "ID":"FM03",
+	"Chemical Name": "Iron powder",
+	"Structure":"Fe",
+        "CAS no.": "7439-89-6",
+        "หมวดหมู่": "สารไวไฟ (ในห้อง)",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-IRON-METAL-POWDER-CASNO-7439-89-04208-TH.aspx"
+},
+      {
+       "ID":"HF01",
+	"Chemical Name": "Citric Acid",
+	"Structure":"C6H8O7 .H2O",
+        "CAS no.": "5949-29-1",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Citric-Acid-Monohydrate-T-010521.pdf"
+},
+      {
+       "ID":"HF02",
+	"Chemical Name": "Sulphur precipitated",
+	"Structure":"S",
+        "CAS no.": "7704-34-9",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SULPHUR-POWDER-CASNO-7704-34-06187-TH.aspx"
+},
+      {
+       "ID":"HF03",
+	"Chemical Name": "Citric Acid Anhydrous",
+	"Structure":"C6H8O7",
+        "CAS no.": "77-92-9",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-CITRIC-ACID-ANHYDROUS-CASNO-77-92-02863-TH.aspx"
+},
+      {
+       "ID":"HF04",
+	"Chemical Name": "Epoxy Resin",
+	"Structure":"C21H25ClO5",
+        "CAS no.": "25068-38-6",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.epoxy.com/msds/2215SDS.pdf"
+},
+      {
+       "ID":"HF05",
+	"Chemical Name": "Triglycerol",
+	"Structure":"C9H20O7",
+        "CAS no.": "20411-31-8",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.sigmaaldrich.com/TH/th/sds/aldrich/17782?userType=anonymous"
+},
+      {
+       "ID":"HF06",
+	"Chemical Name": "Silicotingstic Acid hydrate 99.9+%",
+	"Structure":"H4[SiW12O40]·nH2O",
+        "CAS no.": "12027-43-9",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SILICOTUNGSTIC-ACID-CASNO-12027-43-05726-TH.aspx"
+},
+      {
+       "ID":"HF07",
+	"Chemical Name": "Sulphanilic Acid",
+	"Structure":"C6H7NO3S",
+        "CAS no.": "121-57-3",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SULPHANILIC-ACID-CASNO-121-57-06179-TH.aspx"
+},
+      {
+       "ID":"HF08",
+	"Chemical Name": "Soybean oil, Epoxidized Acrylate",
+	"Structure":"C57H98O12",
+        "CAS no.": "91722-14-4",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.sigmaaldrich.com/TH/th/sds/aldrich/412333?userType=anonymous"
+},
+      {
+       "ID":"HF09",
+	"Chemical Name": "Sodium Oxalate",
+	"Structure":"(COONa)2",
+        "CAS no.": "62-76-0",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-OXALATE-CASNO-62-76-05961-TH.aspx"
+},
+      {
+       "ID":"HF10",
+	"Chemical Name": "Benzaldehyde",
+	"Structure":"C7H6O",
+        "CAS no.": "100-52-7",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-BENZALDEHYDE-CASNO-100-52-00036-TH.aspx"
+},
+      {
+       "ID":"HF11",
+	"Chemical Name": "1-Octanol, 99% for synthesis",
+	"Structure":"C8H18O",
+        "CAS no.": "111-87-5",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-nOCTANOL-CASNO-111-87-5038D-TH.aspx"
+},
+      {
+       "ID":"HF12",
+	"Chemical Name": "Acetophenone",
+	"Structure":"C8H8O",
+        "CAS no.": "98-86-2",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-ACETOPHENONE-CASNO-98-86-00019-TH.aspx"
+},
+      {
+       "ID":"HF13",
+	"Chemical Name": "Sodium Carbonate",
+	"Structure":"Na2CO3",
+        "CAS no.": "497-19-8",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2022/07/Sodium-Carbonate-Anhydrous-T-DCC-010521.pdf"
+},
+      {
+       "ID":"HF14",
+	"Chemical Name": "Calcium Chloride 2-hydrate",
+	"Structure":"CaCl2.2H2O",
+        "CAS no.": "10035-04-8",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2021/04/Calcium-Chloride-Dihydrate-T-DCC-010521.pdf"
+},
+      {
+       "ID":"HF15",
+	"Chemical Name": "Potassium Thiocyanate",
+	"Structure":"KSCN",
+        "CAS no.": "333-20-0",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-POTASSIUM-THIOCYANATE-CASNO-333-20-05459-TH.aspx"
+},
+      {
+       "ID":"HF16",
+	"Chemical Name": "Ammonium Chloride",
+	"Structure":"NH4Cl",
+        "CAS no.": "12125-02-9",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Ammonium-Chloride-T-DCC-010921.pdf"
+},
+      {
+       "ID":"HF17",
+	"Chemical Name": "Potassium Thiocyanate",
+	"Structure":"KSCN",
+        "CAS no.": "333-20-0",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-POTASSIUM-THIOCYANATE-CASNO-333-20-05459-TH.aspx"
+},
+      {
+       "ID":"HF18",
+	"Chemical Name": "p-Toluenesulfonic Acid Monohydrate, 98%",
+	"Structure":"C7H8O3S.H2O",
+        "CAS no.": "6192-52-5",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "MSDS-pTOLUENE-SULPHONIC-ACID-MONOHYDRATE-CASNO-6192-52-06340-TH.aspx"
+},
+      {
+       "ID":"HF19",
+	"Chemical Name": "L-Cysteine Hydrochloride, Monohydrate",
+	"Structure":"C3H10CiNO3S",
+        "CAS no.": "L7048-04-6",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-LCYSTEINE-HYDROCHLORIDE-MONOHYDRATE-CASNO-7048-04-03141-TH.aspx"
+},
+      {
+       "ID":"HF20",
+	"Chemical Name": "Ferric Oxide Red",
+	"Structure":"Fe2O3",
+        "CAS no.": "1309-37-1",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-FERRIC-OXIDE-RED-CASNO-1309-37-03835-TH.aspx"
+},
+      {
+       "ID":"HF21",
+	"Chemical Name": "Sulphamic Acid",
+	"Structure":"H2NSO3H",
+        "CAS no.": "5329-14-6",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SULPHAMIC-ACID-CASNO-5329-14-06170-TH.aspx"
+},
+      {
+       "ID":"HF22",
+	"Chemical Name": "Sodium Polyacrylate",
+	"Structure":"C5H7NaO3",
+        "CAS no.": "27599-56-0",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS":  "https://www.fishersci.com/content/dam/fishersci/en_US/documents/programs/education/regulatory-documents/sds/chemicals/chemicals-s/S25565.pdf"
+},
+      {
+       "ID":"HF23",
+	"Chemical Name": "Ammonium Oxalate Monohydrate",
+	"Structure":"C2H8N2O4.H2O",
+        "CAS no.": "6009-70-7",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-AMMONIUM-OXALATE-MONOHYDRATE-CASNO-6009-70-01310-TH.aspx"
+},
+      {
+       "ID":"HF24",
+	"Chemical Name": "Methylene Blue",
+	"Structure":"C16H18ClN3S.xH2O",
+        "CAS no.": "122965-43-9",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-METHYLENE-BLUE-CASNO-61-73-04646-TH.aspx"
+},
+      {
+       "ID":"HF25",
+	"Chemical Name": "Lead(II) Nitrate",
+	"Structure":"Pb(NO3)2",
+        "CAS no.": "10099-74-8",
+        "หมวดหมู่": "สารที่ต้องระวัง",
+        "SDS": "https://www.unitywewell.com/uploads/products/sds/MSDS_PL0105.pdf"
+},
+      {
+       "ID":"Hh01",
+	"Chemical Name": "Phenolpthalein",
+	"Structure":"C20H14O4",
+        "CAS no.": "77-09-8",
+        "หมวดหมู่": "สารที่เป็นอันตรายต่อสุขภาพ (ชั้น 1 บนขวา)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2021/05/Phenolphthalein-T-010921.pdf"
+},
+      {
+       "ID":"Hh02",
+	"Chemical Name": "Boric Acid",
+	"Structure":"H3BO3",
+        "CAS no.": "10043-35-3",
+        "หมวดหมู่": "สารที่เป็นอันตรายต่อสุขภาพ (ชั้น 1 บนขวา)",
+        "SDS": "https://rcilabscan.com/wp-content/uploads/2019/11/msds_file_th-msds1439433922-th.pdf"
+},
+      {
+       "ID":"Hh03",
+	"Chemical Name": "Potassium Iodine",
+	"Structure":"KI",
+        "CAS no.": "7681-11-0",
+        "หมวดหมู่": "สารที่เป็นอันตรายต่อสุขภาพ (ชั้น 1 บนขวา)",
+        "SDS": "https://rcilabscan.com/wp-content/uploads/2019/11/potassium-iodide-99.5-t-customer-rv01-010818.pdf"
+},
+      {
+       "ID":"Hh04",
+	"Chemical Name": "Sodium tetraborate decahydrate",
+	"Structure":"Na2B4O7.10H2O",
+        "CAS no.": "1303-96-4",
+        "หมวดหมู่": "สารที่เป็นอันตรายต่อสุขภาพ (ชั้น 1 บนขวา)",
+        "SDS": "https://rcilabscan.com/wp-content/uploads/2019/11/borax-t-customer.pdf"
+},
+      {
+       "ID":"Hh05",
+	"Chemical Name": "Phenolphthalein",
+	"Structure":"C20H14O4",
+        "CAS no.": "77-09-8",
+        "หมวดหมู่": "สารที่เป็นอันตรายต่อสุขภาพ (ชั้น 1 บนขวา)",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2021/05/Phenolphthalein-T-010921.pdf"
+},
+      {
+       "ID":"Hh06",
+	"Chemical Name": "Linear alkyl benzene sulfonate (Las)",
+	"Structure":"C10-13-alkyl derivs",
+        "CAS no.": "67774-74-7",
+        "หมวดหมู่": "สารที่เป็นอันตรายต่อสุขภาพ (ชั้น 1 บนขวา)",
+        "SDS": "https://www.qatarenergy.qa/admin/Products/Chemicals/Linear%20Alkyl%20Benzene%20-%20SEEF-LAB-SDS%20-%20MSDS.pdf"
+},
+      {
+       "ID":"HO01",
+	"Chemical Name": "Iron(III) Nitrate Nonahydrate",
+	"Structure":"Fe(NO3)3.9H2O",
+        "CAS no.": "7782-61-8",
+        "หมวดหมู่": "สารที่ต้องระวัง + สารออกซิไดซ์",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-FERRIC-NITRATE-NONAHYDRATE-CASNO-7782-61-03829-TH.aspx"
+},
+      {
+       "ID":"Tx01",
+	"Chemical Name": "Sodium Fluoride",
+	"Structure":"NaF",
+        "CAS no.": "7681-49-4",
+        "หมวดหมู่": "สารพิษ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-FLUORIDE-CASNO-7681-49-05872-TH.aspx"
+},
+      {
+       "ID":"Tx02",
+	"Chemical Name": "Sodium Nitroprusside Dihydrate",
+	"Structure":"Na2[Fe(CN)5NO].2H2O",
+        "CAS no.": "13755-38-9",
+        "หมวดหมู่": "สารพิษ",
+        "SDS": "https://www.lobachemie.com/lab-chemical-msds/MSDS-SODIUM-NITROPRUSSIDE-CASNO-13755-38-05958-TH.aspx"
+},
+      {
+       "ID":"Tx03",
+	"Chemical Name": "Methyl Orange",
+	"Structure":"C14H14N3SO3Na",
+        "CAS no.": "547-58-0",
+        "หมวดหมู่": "สารพิษ",
+        "SDS": "https://www.rcilabscan.com/wp-content/uploads/2019/11/Methyl-Orange-T-DCC-010921.pdf"
+
+	}
+    ];
+
+     const categorySelect = document.getElementById('categorySelect');
+    const searchInput = document.getElementById('search');
+    const output = document.getElementById('output');
+
+    function populateCategories() {
+      const categories = [...new Set(allData.map(item => item.หมวดหมู่))].sort();
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        categorySelect.appendChild(option);
+      });
+    }
+
+    function filterAndShow() {
+      const selectedCategory = categorySelect.value;
+      const keyword = searchInput.value.toLowerCase();
+
+      let filtered = allData.filter(item => {
+        const matchName = item["Chemical Name"]?.toLowerCase().includes(keyword);
+        const matchCAS = item["CAS no."]?.toLowerCase().includes(keyword);
+	 const matchStructure = item["Structure"]?.toLowerCase().includes(keyword);
+        const matchCategory = selectedCategory === "all" || item.หมวดหมู่ === selectedCategory;
+        return (matchName || matchCAS|| matchStructure) && matchCategory;
+      });
+
+      // เรียงตามชื่อสาร (อักษร ก-ฮ)
+     filtered.sort((a, b) => a["Chemical Name"].localeCompare(b["Chemical Name"], 'th-u-kn-true'));
+
+      showTable(filtered);
+    }
+
+    function showTable(data) {
+      if (data.length === 0) {
+        output.innerHTML = '<p>❌ ไม่พบข้อมูลที่ค้นหา</p>';
+        return;
+      }
+
+      let html = `<table><thead><tr>
+        <th>Chemical Name</th>
+	<th>Structure</th>
+        <th>CAS no.</th>
+        <th>หมวดหมู่</th>
+        <th>SDS</th>
+      </tr></thead><tbody>`;
+
+      data.forEach(row => {
+        const sdsLink = row.SDS
+          ? `<a href="${row.SDS}" target="_blank" rel="noopener noreferrer">ดู SDS</a>`
+          : '-';
+        html += `<tr>
+          <td>${row["Chemical Name"]}</td>
+	  <td>${row["Structure"]}</td>
+          <td>${row["CAS no."]}</td>
+          <td>${row["หมวดหมู่"]}</td>
+          <td>${sdsLink}</td>
+        </tr>`;
+      });
+
+      html += '</tbody></table>';
+      output.innerHTML = html;
+    }
+
+    function downloadJSON() {
+      const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'chemical_data.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    window.onload = function () {
+      populateCategories();
+      filterAndShow();
+    };
+
+    categorySelect.addEventListener('change', filterAndShow);
+    searchInput.addEventListener('input', filterAndShow);
+  </script>
+</body>
+</html>
